@@ -140,8 +140,8 @@ enum ButtonEnum {
         Y = 15,
         XBOX = 16,
         SYNC = 17,
-        BLACK = 8, // Available on the original Xbox controller
-        WHITE = 9, // Available on the original Xbox controller
+        // BLACK = 8, // Available on the original Xbox controller
+        // WHITE = 9, // Available on the original Xbox controller
         /**@}*/
 
         /** PS Buzz controllers */
