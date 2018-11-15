@@ -243,7 +243,14 @@ uint8_t* MAX3421e< SPI_SS, INTR >::bytesWr(uint8_t reg, uint8_t nbytes, uint8_t*
         data_p += nbytes;
 #elif !defined(SPDR) // ESP8266, ESP32
         USB_SPI.transfer(reg | 0x02);
+        uint32_t curtimeout252 = (uint32_t)millis() + StaticTimeout;
+
         while(nbytes) {
+                if((int32_t)((uint32_t)millis() - curtimeout252) >= 0L) 
+                {
+                        Serial.println("TIMEOUT -- usbhost.h LINE 252");
+                        break;
+                }
                 USB_SPI.transfer(*data_p);
                 nbytes--;
                 data_p++; // advance data pointer
@@ -346,7 +353,14 @@ uint8_t* MAX3421e< SPI_SS, INTR >::bytesRd(uint8_t reg, uint8_t nbytes, uint8_t*
         data_p += nbytes;
 #elif !defined(SPDR) // ESP8266, ESP32
         USB_SPI.transfer(reg);
+        uint32_t curtimeout362 = (uint32_t)millis() + StaticTimeout;
+
         while(nbytes) {
+                if((int32_t)((uint32_t)millis() - curtimeout362) >= 0L) 
+                {
+                        Serial.println("TIMEOUT -- usbhost.h LINE 362");
+                        break;
+                }
             *data_p++ = USB_SPI.transfer(0);
             nbytes--;
         }
@@ -413,7 +427,14 @@ uint16_t MAX3421e< SPI_SS, INTR >::reset() {
         uint16_t i = 0;
         regWr(rUSBCTL, bmCHIPRES);
         regWr(rUSBCTL, 0x00);
+        uint32_t curtimeout436 = (uint32_t)millis() + StaticTimeout;
+
         while(++i) {
+                if((int32_t)((uint32_t)millis() - curtimeout436) >= 0L) 
+                {
+                        Serial.println("TIMEOUT -- usbhost.h LINE 436");
+                        break;
+                }
                 if((regRd(rUSBIRQ) & bmOSCOKIRQ)) {
                         break;
                 }
@@ -448,7 +469,15 @@ int8_t MAX3421e< SPI_SS, INTR >::Init() {
 
         /* check if device is connected */
         regWr(rHCTL, bmSAMPLEBUS); // sample USB bus
-        while(!(regRd(rHCTL) & bmSAMPLEBUS)); //wait for sample operation to finish
+        uint32_t curtimeout478 = (uint32_t)millis() + StaticTimeout;
+
+        while(!(regRd(rHCTL) & bmSAMPLEBUS)){
+                if((int32_t)((uint32_t)millis() - curtimeout478) >= 0L) 
+                {
+                        Serial.println("TIMEOUT -- usbhost.h LINE 478");
+                        break;
+                }
+        } //wait for sample operation to finish
 
         busprobe(); //check if anything is connected
 
@@ -489,7 +518,15 @@ int8_t MAX3421e< SPI_SS, INTR >::Init(int mseconds) {
 
         /* check if device is connected */
         regWr(rHCTL, bmSAMPLEBUS); // sample USB bus
-        while(!(regRd(rHCTL) & bmSAMPLEBUS)); //wait for sample operation to finish
+        uint32_t curtimeout527 = (uint32_t)millis() + StaticTimeout;
+
+        while(!(regRd(rHCTL) & bmSAMPLEBUS)){
+                if((int32_t)((uint32_t)millis() - curtimeout527) >= 0L) 
+                {
+                        Serial.println("TIMEOUT -- usbhost.h LINE 527");
+                        break;
+                }
+        } //wait for sample operation to finish
 
         busprobe(); //check if anything is connected
 
