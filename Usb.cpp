@@ -167,15 +167,9 @@ uint8_t USB::ctrlReq(uint8_t addr, uint8_t ep, uint8_t bmReqType, uint8_t bReque
                 {
                         uint16_t left = total;
 
-                        pep->bmRcvToggle = 1; //bmRCVTOG1; 
-                        uint32_t curtimeout = (uint32_t)millis() + StaticTimeout;
+                        pep->bmRcvToggle = 1; //bmRCVTOG1;
 
                         while(left) {
-                                if((int32_t)((uint32_t)millis() - curtimeout) < 0L) 
-                                {
-                                        break;
-                                        Serial.println("TIMEOUT -- USB.CPP LINE 177");
-                                }
                                 // Bytes read into buffer
                                 uint16_t read = nbytes;
                                 //uint16_t read = (left<nbytes) ? left : nbytes;
@@ -243,14 +237,7 @@ uint8_t USB::InTransfer(EpInfo *pep, uint16_t nak_limit, uint16_t *nbytesptr, ui
         regWr(rHCTL, (pep->bmRcvToggle) ? bmRCVTOG1 : bmRCVTOG0); //set toggle value
 
         // use a 'break' to exit this loop
-        uint32_t curtimeout = (uint32_t)millis() + StaticTimeout;
-
         while(1) {
-                if((int32_t)((uint32_t)millis() - curtimeout) < 0L) 
-                {
-                        break;
-                        Serial.println("TIMEOUT -- USB.CPP LINE 252");
-                }
                 rcode = dispatchPkt(tokIN, pep->epAddr, nak_limit); //IN packet to EP-'endpoint'. Function takes care of NAKS.
                 if(rcode == hrTOGERR) {
                         // yes, we flip it wrong here so that next time it is actually correct!
@@ -336,30 +323,15 @@ uint8_t USB::OutTransfer(EpInfo *pep, uint16_t nak_limit, uint16_t nbytes, uint8
         uint32_t timeout = (uint32_t)millis() + USB_XFER_TIMEOUT;
 
         regWr(rHCTL, (pep->bmSndToggle) ? bmSNDTOG1 : bmSNDTOG0); //set toggle value
-        uint32_t curtimeout = (uint32_t)millis() + StaticTimeout;
 
         while(bytes_left) {
-                if((int32_t)((uint32_t)millis() - curtimeout) < 0L) 
-                {
-                        break;
-                        Serial.println("TIMEOUT -- USB.CPP LINE 345");
-                }
                 retry_count = 0;
                 nak_count = 0;
                 bytes_tosend = (bytes_left >= maxpktsize) ? maxpktsize : bytes_left;
                 bytesWr(rSNDFIFO, bytes_tosend, data_p); //filling output FIFO
                 regWr(rSNDBC, bytes_tosend); //set number of bytes
                 regWr(rHXFR, (tokOUT | pep->epAddr)); //dispatch packet
-                uint32_t curtimeout = (uint32_t)millis() + StaticTimeout;
-
-                while(!(regRd(rHIRQ) & bmHXFRDNIRQ))
-                {
-                        if((int32_t)((uint32_t)millis() - curtimeout) < 0L) 
-                        {
-                                break;
-                                Serial.println("TIMEOUT -- USB.CPP LINE 360");
-                        }
-                } //wait for the completion IRQ
+                while(!(regRd(rHIRQ) & bmHXFRDNIRQ)); //wait for the completion IRQ
                 regWr(rHIRQ, bmHXFRDNIRQ); //clear IRQ
                 rcode = (regRd(rHRSL) & 0x0f);
 
@@ -391,16 +363,7 @@ uint8_t USB::OutTransfer(EpInfo *pep, uint16_t nak_limit, uint16_t nbytes, uint8
                         regWr(rSNDFIFO, *data_p);
                         regWr(rSNDBC, bytes_tosend);
                         regWr(rHXFR, (tokOUT | pep->epAddr)); //dispatch packet
-                        uint32_t curtimeout = (uint32_t)millis() + StaticTimeout;
-
-                        while(!(regRd(rHIRQ) & bmHXFRDNIRQ))
-                        {
-                                if((int32_t)((uint32_t)millis() - curtimeout) < 0L) 
-                                {
-                                        break;
-                                        Serial.println("TIMEOUT -- USB.CPP LINE 401");
-                                }
-                        } //wait for the completion IRQ
+                        while(!(regRd(rHIRQ) & bmHXFRDNIRQ)); //wait for the completion IRQ
                         regWr(rHIRQ, bmHXFRDNIRQ); //clear IRQ
                         rcode = (regRd(rHRSL) & 0x0f);
                 }//while( rcode && ....

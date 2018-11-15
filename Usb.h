@@ -25,8 +25,6 @@ e-mail   :  support@circuitsathome.com
 #ifndef _usb_h_
 #define _usb_h_
 
-#define StaticTimeout        1000
-
 // WARNING: Do not change the order of includes, or stuff will break!
 #include <inttypes.h>
 #include <stddef.h>
